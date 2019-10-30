@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Employee Records</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <link href="Content/Site.css" rel="stylesheet" />
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/jquery.validate.min.js"></script>
+    <script src="Scripts/respond.js"></script>
+
+    <script src="Scripts/MyScript.js"></script>
+     <!--<style>
+        body {
+            background: #333;
+        }
+        </style>-->
+</head>
+<body onload="processUser()">
+    <div class="container">
+        <h2>List Records</h2>
+        <p>
+            <a href="CreateEmployeeRecord.html" class="btn btn-primary">Create New</a>
+            <a href="Login.html" class="btn btn-primary">Log Out</a>
+        </p>
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    FirstName
+                </th>
+                <th>
+                    LastName
+                </th>
+                <th>
+                    Gender
+                </th>
+                <th>
+                    Salary
+                </th>
+                <th>
+                    Operation
+                </th>
+            </tr>
+            <tbody id="tableRows"></tbody>
+        </table>
+    </div>
+
+
+    <script>
+        var UserName;
+        var Password;
+        function processUser() {
+            var parameters = location.search.substring(1).split("&");
+
+            var temp = parameters[0].split("=");
+            var temp2 = parameters[1].split("=");
+            var ii = unescape(temp[1]);
+            var kk = unescape(temp2[1]);
+            UserName = atob(ii);
+            Password = atob(kk);
+            LoadAll();
+            //$.ajax({
+            //    url: 'http://localhost:18196/api/Employee/GetEmployee/' + parseInt(employeeId),
+            //    type: 'GET',
+            //    dataType: 'json',
+            //    success: function (person, status) {
+            //        if (status == 'success') {
+                     
+            //        }
+            //        else {
+            //            alert("Something goto wrong!!!!");
+            //            window.location = "http://localhost:18196/EmployeeRecord.html";
+            //        }
+
+            //    },
+            //    error: function (xhr, status, error) { alert(error); }
+            //});
+
+        }
+
+        //All Employee Records
+        //$(function () {
+        //    LoadAll();
+        //});
+        function LoadAll() {
+            $.ajax(
+            {
+                url: 'http://localhost:18196/api/Employee/',
+                type: 'GET',
+                dataType: 'json',
+                headers:
+                {
+                    Authorization: 'Basic ' + btoa(UserName + ':' + Password)
+                },
+                success: function (data, status, xhr) {
+                    if (status == 'success' && data != null) {
+                        processDataMethod(data);
+                    }
+                    else {
+                        LoadAll();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        }
+
+
+        function processDataMethod(data) {
+            var output = $("#tableRows");
+            output.empty();
+            for (var i = 0; i < data.length ; i++) {
+                var person = data[i];
+                output.append("<tr><td>" + person.FirstName + "</td><td>" +
+                person.LastName + "</td><td>" + person.Gender + "</td><td>" + person.Salary +
+                "</td><td><a href='javascript:EditDetails(" + person.ID +
+                ")' title='Edit details'>Edit</a> | <a href='javascript:ShowDetails(" + person.ID +
+                ")' title='Show details'>Details</a> | <a style='color:red;' href='javascript:DeleteRecord(" + person.ID +
+                ")' title='Delete details'>Delete</a></td></tr>");
+            }
+        }
+
+        //Show employee details
+        function ShowDetails(id) {
+            $.ajax({
+                url: 'http://localhost:18196/api/Employee/GetEmployee/' + parseInt(id),
+                type: 'GET',
+                dataType: 'json',
+                success: function (person, status, xhr) {
+                    var output = $("#tableRows"); output.empty();
+                    output.append("<tr><td>" + person[0].FirstName + "</td><td>" + person[0].LastName + "</td><td>" + person[0].Gender + "</td><td>" + person[0].Salary + "</td><td><a style='color:red;' href='javascript:DeleteRecord(" + person[0].ID + ")' title='Delete details'>Delete</a></td></tr>");//User for store procedure (list)
+                    //output.append("<tr><td>" + person.FirstName + "</td><td>" + person.LastName + "</td><td>" + person.Gender + "</td><td>" + person.Salary + "</td><td><a style='color:red;' href='javascript:DeleteRecord(" + person.Id + ")' title='Delete details'>Delete</a></td></tr>");//User for without store procedure (with out list)
+
+                },
+                error: function (xhr, status, error) { alert(error); }
+            });
+        }
+
+        //Edit Employee Record
+        function EditDetails(Id) {
+            var ll = btoa(Id);
+            window.location = "http://localhost:18196/EditEmployeeRecord.html?UserId=" + ll;
+
+        }
+
+        //Create New Employee record
+
+        //Delete Employee Record
+
+        function DeleteRecord(id) {
+            $.ajax({
+                url: 'http://localhost:18196/api/Employee/DeleteEmployeeDetails/' + parseInt(id),
+                type: 'DELETE',
+                dataType: 'json',
+                success: function (person, status, xhr) {
+                    LoadAll();
+                },
+                error: function (xhr, status, error) { alert(error); }
+            });
+        }
+    </script>
+</body>
+
+</html>

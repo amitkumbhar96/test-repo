@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <link href="Content/Site.css" rel="stylesheet" />
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/jquery.validate.min.js"></script>
+    <script src="Scripts/respond.js"></script>
+    <script src="Scripts/MyScript.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=renderButton" async defer></script>
+    <meta name="google-signin-client_id" content="814802533495-rpa5erk102o510hk9f9rvoe5tg4kcibr.apps.googleusercontent.com">
+    <style>
+        body {
+            background: #333;
+        }
+
+        .form_bg {
+            background-color: #eee;
+            color: #666;
+            padding: 20px;
+            border-radius: 5px;
+            position: absolute;
+            border: 1px solid #fff;
+            margin: auto;
+        }
+
+        .align-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 form_bg">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h1>Login</h1>
+                        <hr>
+                    </div>
+                    <div class="panel-body ">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label>User Name:</label>
+                                    <input type="email" name="user_name" id="user_name" tabindex="1" class="form-control" placeholder="User Name">
+
+                                </div>
+                                <div class="form-group">
+                                    <label>Password:</label>
+                                    <input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+                                </div>
+                                <div class="form-group">
+                                    <input type="checkbox" name="RememberMe" id="RememberMe" tabindex="3">
+                                    <label>RememberMe</label>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-sm-6 col-sm-offset-3">
+                                            <input type="submit" name="Login" id="btnLogin" tabindex="4" class="btn btn-primary" value="Login">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <a href="Registration.html">Registration</a><br />
+                                    OR<br />
+                                    <br />
+                                    <button id="gSignIn"></button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row userContent"></div>
+    </div>
+
+
+    
+
+
+    <script>
+
+        $("#btnLogin").click(function () {
+
+            function validateEmail(email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+
+            if (!$('#user_name').val()) {
+                if ($("#user_name").parent().next(".validation").length == 0) // only add if not added
+                {
+                    $("#user_name").parent().after("<div class='validation' style='color:red;margin-bottom: 20px;'>Please enter email address</div>");
+                    return false;
+                }
+            } else {
+                $("#user_name").parent().next(".validation").remove(); // remove it
+                if (!validateEmail($('#user_name').val())) {
+
+                    $("#user_name").parent().after("<div class='validation' style='color:red;margin-bottom: 20px;'>Please enter valid email address</div>");
+                    return false;
+                }
+                else {
+                    $("#user_name").parent().next(".validation").remove(); // remove it
+                }
+            }
+
+            if (!$('#password').val()) {
+                if ($("#password").parent().next(".validation").length == 0) // only add if not added
+                {
+                    $("#password").parent().after("<div class='validation' style='color:red;margin-bottom: 20px;'>Please enter password</div>");
+                    return false;
+                }
+            } else {
+                $("#password").parent().next(".validation").remove(); // remove it
+            }
+
+           
+            
+        var UserLogin = {
+            "UserName": $('#user_name').val(),
+            "Password": $('#password').val(),
+            "RememberMe": $('#RememberMe').val(),
+            "UserType": "1",
+        };
+        if (UserLogin.Email != "" && UserLogin.Password != "" && UserLogin.RememberMe != "") {
+            $.ajax({
+                type: "POST",
+                url: 'http://localhost:18196/api/User/Login',
+                data: JSON.stringify(UserLogin),
+                contentType: "application/json;charset=utf-8",
+                success: function (status) {
+                    if (status == "loginsuccess") {
+                        window.location.href = "http://localhost:23041/Login.html"
+                        //window.location.href = "http://localhost:18196/EmployeeRecord.html/?username=" + encodeURIComponent(UserLogin.UserName) + "&password" + encodeURIcomponent(UserLogin.Password);
+                    }
+                    else  if(status=="Invalid")
+                    {
+                        alert("Invalid UserName OR Password !!!");
+                    }
+                    else {
+                        alert("Error");
+                        window.location.href = "http://localhost:23041/Login.html"
+                        
+                    }
+                },
+                error: function (xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+        else {
+
+            alert("fill all entry!!!");
+            return false;
+        }
+    });
+    </script>
+
+    <script>
+    // Render Google Sign-in button
+        function renderButton() {
+        gapi.signin2.render('gSignIn', {
+            'scope': 'profile email',
+            'width': 240,
+            'height': 50,
+            'longtitle': true,
+            'theme': 'dark',
+            'onsuccess': onSuccess,
+            'onfailure': onFailure
+        });
+    }
+        var employee;
+    // Sign-in success callback
+    function onSuccess(googleUser) {
+        // Get the Google profile data (basic)
+        var profile = googleUser.getBasicProfile();
+        employee = {
+            "FirstName": profile.ofa,
+            "LastName": profile.wea,
+            "UserName": profile.U3,
+            "Password": "12345",
+            "IsEmailVerified": true,
+            "UserType": "3",
+        }
+        $.ajax({
+            type: "POST",
+            url: 'http://localhost:18196/api/User/Login',
+            data: JSON.stringify(employee),
+            contentType: "application/json;charset=utf-8",
+            success: function (status) {
+                if (status == "loginsuccess") {
+                    gapi.client.load('oauth2', 'v2', function () {
+                        var request = gapi.client.oauth2.userinfo.get({
+                            'userId': 'me'
+                        });
+                    });
+                    document.getElementById("gSignIn").style.display = "none";
+                    signOut();
+                    // window.location = "http://localhost:18196/EmployeeRecord.html";
+                }else if(status=="Invalid")
+                {
+                    alert("Invalid UserName Or Password");
+                }
+                else if (status == "NA") {
+                    alert("Create Your Account first!!!!");
+                }
+                else {
+                    alert("Error");
+                }
+            },
+            error: function (xhr) {
+                alert(xhr.responseText);
+            }
+        });
+        //gapi.client.load('oauth2', 'v2', function () {
+        //    var request = gapi.client.oauth2.userinfo.get({
+        //        'userId': 'me'
+        //    });
+        //    request.execute(function (resp) {
+        //        // Display the user details
+               
+               
+        //        var profileHTML = '<h3>Welcome ' + resp.given_name + '! <a href="javascript:void(0);" onclick="signOut();">Sign out</a></h3>';
+        //        profileHTML += '<img src="' + resp.picture + '"/><p><b>Google ID: </b>' + resp.id + '</p><p><b>Name: </b>' + resp.name + '</p><p><b>Email: </b>' + resp.email + '</p><p><b>Gender: </b>' + resp.gender + '</p><p><b>Locale: </b>' + resp.locale + '</p><p><b>Google Profile:</b> <a target="_blank" href="' + resp.link + '">click to view profile</a></p>';
+        //        document.getElementsByClassName("userContent")[0].innerHTML = profileHTML;
+
+        //        document.getElementById("gSignIn").style.display = "none";
+        //        document.getElementsByClassName("userContent")[0].style.display = "block";
+        //    });
+        //});
+      
+    }
+
+    // Sign-in failure callback
+    function onFailure(error) {
+        alert(error);
+    }
+
+    // Sign out the user
+    function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            //document.getElementsByClassName("userContent")[0].innerHTML = '';
+            //document.getElementsByClassName("userContent")[0].style.display = "none";
+            //document.getElementById("gSignIn").style.display = "block";
+            
+        });
+
+        auth2.disconnect();
+
+
+        setTimeout(myFunction, 500);
+
+
+        function myFunction() {
+            window.location.href = "http://localhost:18196/EmployeeRecord.html?username=" + btoa(employee.UserName) + "&password=" + btoa(employee.Password);
+            //window.location = "http://localhost:18196/EmployeeRecord.html";
+        }
+       
+        //return "success";
+    }
+    </script>
+
+</body>
+</html>

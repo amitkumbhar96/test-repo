@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit Employee Records</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <link href="Content/Site.css" rel="stylesheet" />
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/jquery.validate.min.js"></script>
+    <script src="Scripts/respond.js"></script>
+    <style>
+        body {
+            background: #333;
+        }
+
+        .form_bg {
+            background-color: #eee;
+            color: #666;
+            padding: 20px;
+            border-radius: 5px;
+            position: absolute;
+            border: 1px solid #fff;
+            margin: auto;
+        }
+
+        .align-center {
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body onload="processUser()">
+
+    <div id="EditEmployeeRecord" class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 form_bg">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h1>Edit Employee</h1>
+                        <hr>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label>First Name:</label>
+                                    <input type="text" name="first_name" id="first_name" tabindex="1" class="form-control" placeholder="First Name" value="">
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name:</label>
+                                    <input type="text" name="last_name" id="last_name" tabindex="2" class="form-control" placeholder="Last Name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender:</label>
+                                    <select name="dropdown" id="gender" class="form-control">
+                                        <option value="Male" selected>Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Salary:</label>
+                                    <input type="text" name="salary" id="salary" tabindex="4" class="form-control" placeholder="Salary">
+                                </div>
+
+                                <div class="form-group align-center">
+                                    <div class="row">
+                                        <div class="col-sm-6 col-sm-offset-3">
+                                            <input type="submit" name="Update" id="btnUpdate" tabindex="5" class="btn btn-default" value="Update">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="EmployeeRecord.html">back to Employee records</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script language="JavaScript">
+        var employeeId;
+        function processUser() {
+            var parameters = location.search.substring(1).split("&");
+
+            var temp = parameters[0].split("=");
+            ii = unescape(temp[1]);
+            employeeId = atob(ii);
+            $.ajax({
+                url: 'http://localhost:18196/api/Employee/GetEmployee/' + parseInt(employeeId),
+                type: 'GET',
+                dataType: 'json',
+                success: function (person, status) {
+                    if (status == 'success') {
+                        //With store Procedure(List)
+                        $('input[name="first_name"]').val(person[0].FirstName);
+                        $('input[name="last_name"]').val(person[0].LastName);
+                        $('select[name="dropdown"]').val(person[0].Gender);
+                        $('input[name="salary"]').val(person[0].Salary);
+                        //Without store procedure(Without List)
+                        //$('input[name="first_name"]').val(person.FirstName);
+                        //$('input[name="last_name"]').val(person.LastName);
+                        //$('select[name^="gender"]').val(person.Gender);
+                        //$('input[name="salary"]').val(person.Salary);
+                        $('#EditEmployeeRecord').show();
+                    }
+                    else {
+                        alert("Something goto wrong!!!!");
+                        window.location = "http://localhost:18196/EmployeeRecord.html";
+                    }
+
+                },
+                error: function (xhr, status, error) { alert(error); }
+            });
+           
+        }
+
+
+        $("#btnUpdate").click(function () {
+            var employee = {
+                "Id": parseInt(employeeId),
+                "FirstName": $('#first_name').val(),
+                "LastName": $('#last_name').val(),
+                "Gender": $('#gender').val(),
+                "Salary": $('#salary').val(),
+            };
+            if (employee.Id != "" && employee.FirstName != "" && employee.LastName != "" && employee.Gender != "" && employee.Salary != "") {
+                $.ajax({
+                    type: "PUT",
+                    url: 'http://localhost:18196/api/Employee/EditEmployeeDetails/' + parseInt(employeeId),
+                    data: JSON.stringify(employee),
+                    contentType: "application/json;charset=utf-8",
+                    success: function (status) {
+                        if (status == "success") {
+                            window.location = "http://localhost:18196/EmployeeRecord.html";
+                        }
+                        else {
+                            alert("Error");
+                        }
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseText);
+                    }
+                });
+            }
+            else {
+
+                alert("fill all entry!!!");
+                return false;
+            }
+
+
+        });
+    </script>
+</body>
+</html>

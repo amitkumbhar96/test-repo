@@ -83,11 +83,8 @@
         <div class="row userContent"></div>
     </div>
 
-
-    
-
-
     <script>
+
 
         $("#btnLogin").click(function () {
 
@@ -124,8 +121,6 @@
                 $("#password").parent().next(".validation").remove(); // remove it
             }
 
-           
-            
         var UserLogin = {
             "UserName": $('#user_name').val(),
             "Password": $('#password').val(),
@@ -266,10 +261,14 @@
             window.location.href = "http://localhost:18196/EmployeeRecord.html?username=" + btoa(employee.UserName) + "&password=" + btoa(employee.Password);
             //window.location = "http://localhost:18196/EmployeeRecord.html";
         }
-       
-        //return "success";
     }
+
     </script>
 
+    <script>
+        function kk() {
+            alert("Amit Kumbhar");
+        }
+    </script>
 </body>
 </html>

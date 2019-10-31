@@ -1,0 +1,1 @@
+﻿select * from Registration where Email='a@gmail.com'

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EmployeeDBNewModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Registration">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Password" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="IsEmailVerified" Type="Boolean" />
+    <Property Name="ActivationCode" Type="Guid" />
+    <NavigationProperty Name="UserLogins" Relationship="EmployeeDBNewModel.FK__UserLogin__UserR__239E4DCF" FromRole="Registration" ToRole="UserLogin" />
+  </EntityType>
+  <EntityContainer Name="EmployeeDBNewEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Registrations" EntityType="Self.Registration" />
+    <EntitySet Name="UserLogins" EntityType="EmployeeDBNewModel.UserLogin" />
+    <AssociationSet Name="FK__UserLogin__UserR__239E4DCF" Association="EmployeeDBNewModel.FK__UserLogin__UserR__239E4DCF">
+      <End Role="Registration" EntitySet="Registrations" />
+      <End Role="UserLogin" EntitySet="UserLogins" />
+    </AssociationSet>
+    <FunctionImport Name="EmailExitOrNot">
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="isExist" Mode="InOut" Type="Boolean" />
+    </FunctionImport>
+    <EntitySet Name="Employees" EntityType="EmployeeDBNewModel.Employee" />
+  </EntityContainer>
+  <EntityType Name="UserLogin">
+    <Key>
+      <PropertyRef Name="userId" />
+    </Key>
+    <Property Name="userId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Email" Type="String" Nullable="false" MaxLength="254" FixedLength="false" Unicode="false" />
+    <Property Name="Password" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="RememberMe" Type="Boolean" />
+    <Property Name="UserRegisterID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Registration" Relationship="EmployeeDBNewModel.FK__UserLogin__UserR__239E4DCF" FromRole="UserLogin" ToRole="Registration" />
+  </EntityType>
+  <Association Name="FK__UserLogin__UserR__239E4DCF">
+    <End Type="EmployeeDBNewModel.Registration" Role="Registration" Multiplicity="1" />
+    <End Type="EmployeeDBNewModel.UserLogin" Role="UserLogin" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Registration">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="UserLogin">
+        <PropertyRef Name="UserRegisterID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Employee">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FirstName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="LastName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Gender" Type="String" Nullable="false" MaxLength="25" FixedLength="false" Unicode="false" />
+    <Property Name="Salary" Type="Int32" Nullable="false" />
+  </EntityType>
+</Schema>
